@@ -12,9 +12,9 @@ import (
 func ParseBody(request events.APIGatewayProxyRequest) (*forms.Data, error) {
 	httpRequest := httptest.NewRequest(request.HTTPMethod, request.Path, strings.NewReader(request.Body))
 	if content, ok := request.Headers["Content-Type"]; ok {
-		httpRequest.Header.Add("Content-Type", content)
+		httpRequest.Header.Set("Content-Type", content)
 	} else if content, ok := request.Headers["content-type"]; ok {
-		httpRequest.Header.Add("Content-Type", content)
+		httpRequest.Header.Set("Content-Type", content)
 	}
 
 	err := httpRequest.ParseForm()
