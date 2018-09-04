@@ -13,7 +13,7 @@ func TestParseBody(test *testing.T) {
 		Resource:   "hello",
 		Path:       "/hello",
 		Headers:    map[string]string{"content-type": "application/json"},
-		Body:       "{\"hello\": \"there\"}",
+		Body:       "",
 	}
 	data, err := ParseBody(request)
 	if err != nil {
