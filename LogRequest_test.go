@@ -1,7 +1,6 @@
 package httpparser
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -23,6 +22,15 @@ type StructTest3 struct {
 	Bye string `log:"false"`
 }
 
+func (s StructTest1) Log() {
+	tempT3 := make([]StructTest3, 0)
+	for _, val := range s.Test3 {
+		tempT3 = append(tempT3, val)
+	}
+	s.Test3 = tempT3
+	LogRequest(&s)
+}
+
 func TestLogRequest(t *testing.T) {
 	s1 := StructTest1{
 		Name: "ken",
@@ -42,15 +50,11 @@ func TestLogRequest(t *testing.T) {
 	}
 	s3 := []StructTest3{s3T1, s3T2}
 	s1.Test3 = s3
-	logging(s1)
-	fmt.Println(s1)
-}
-
-func logging(t StructTest1) {
-	tempT3 := make([]StructTest3, 0)
-	for _, val := range t.Test3 {
-		tempT3 = append(tempT3, val)
+	s1.Log()
+	if s1.Name != "ken" {
+		t.Fail()
 	}
-	t.Test3 = tempT3
-	LogRequest(&t)
+	if *s1.Body != "hello" {
+		t.Fail()
+	}
 }
