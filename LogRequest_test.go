@@ -9,9 +9,11 @@ import (
 type StructTest1 struct {
 	Name  string  `log:"false"`
 	Body  *string `log:"false"`
-	Test2 StructTest2
+	Test2 *StructTest2
 	Test3 []StructTest3
-	Test4 StructTest2 `log:"false"`
+	Test4 *StructTest2 `log:"false"`
+	Hehe  []byte
+	Asd   []string `log:"false"`
 }
 
 type StructTest2 struct {
@@ -35,12 +37,14 @@ func TestLogRequest(t *testing.T) {
 	s1 := StructTest1{
 		Name: "ken",
 		Body: aws.String("hello"),
-		Test2: StructTest2{
+		Test2: &StructTest2{
 			Hello: "There",
 		},
-		Test4: StructTest2{
+		Test4: &StructTest2{
 			Hello: "yew",
 		},
+		Hehe: []byte{byte('A'), byte('B')},
+		Asd:  []string{"asd", "bef"},
 	}
 	s3T1 := StructTest3{
 		Bye: "a",
