@@ -12,6 +12,7 @@ type StructTest1 struct {
 	Body  *string `log:"false"`
 	Test2 *StructTest2
 	Test3 []StructTest3
+	Scope []*string
 	Hello map[string]string
 	Wow   map[string]*string
 	Test4 *StructTest2 `log:"false"`
@@ -39,8 +40,9 @@ func (s StructTest1) Log() {
 
 func TestLogRequest(t *testing.T) {
 	s1 := StructTest1{
-		Name: "ken",
-		Body: aws.String("hello"),
+		Name:  "ken",
+		Body:  aws.String("hello"),
+		Scope: []*string{aws.String("hello"), aws.String("tere")},
 		Test2: &StructTest2{
 			Hello: "There",
 			Gg:    map[string]string{"hello": "there"},

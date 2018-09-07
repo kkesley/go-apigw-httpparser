@@ -40,7 +40,6 @@ func LogRequest(request interface{}) (err error) {
 
 func stripValues(t reflect.Type, v reflect.Value) (err error) {
 	if v.Kind() != reflect.Struct {
-		v.Set(reflect.Zero(t))
 		return nil
 	}
 	for i := 0; i < t.NumField(); i++ {
