@@ -54,7 +54,6 @@ func stripValues(t reflect.Type, v reflect.Value) (err error) {
 			continue
 		}
 
-		fmt.Println(field.Type.Name())
 		if value.Kind() == reflect.Struct {
 			stripValues(value.Type(), value)
 		} else if value.Kind() == reflect.Slice {

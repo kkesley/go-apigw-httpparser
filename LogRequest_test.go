@@ -1,6 +1,7 @@
 package httpparser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -12,6 +13,7 @@ type StructTest1 struct {
 	Test2 *StructTest2
 	Test3 []StructTest3
 	Hello map[string]string
+	Wow   map[string]*string
 	Test4 *StructTest2 `log:"false"`
 	Hehe  []byte
 	Asd   []string `log:"false"`
@@ -48,6 +50,7 @@ func TestLogRequest(t *testing.T) {
 			Gg:    map[string]string{"hello": "there"},
 		},
 		Hello: map[string]string{"hello": "there"},
+		Wow:   map[string]*string{"hello": aws.String("there"), "hmmm": nil},
 		Hehe:  []byte{byte('A'), byte('B')},
 		Asd:   []string{"asd", "bef"},
 	}
@@ -60,6 +63,7 @@ func TestLogRequest(t *testing.T) {
 	s3 := []StructTest3{s3T1, s3T2}
 	s1.Test3 = s3
 	s1.Log()
+	fmt.Println(s1)
 	if s1.Name != "ken" {
 		t.Fail()
 	}
