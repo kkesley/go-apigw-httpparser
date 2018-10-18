@@ -11,6 +11,11 @@ import (
 
 //LogRequest logs request to stderr
 func LogRequest(request interface{}) (err error) {
+	return Log(request, "REQUEST")
+}
+
+//Log the object
+func Log(message interface{}, logType string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
@@ -22,20 +27,25 @@ func LogRequest(request interface{}) (err error) {
 			err = r.(error)
 		}
 	}()
-	value := reflect.ValueOf(request)
+	value := reflect.ValueOf(message)
 	if value.Kind() != reflect.Ptr || value.IsNil() {
 		return errors.New("value must be pointer")
 	}
-	if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
+	if err := stripValues(reflect.TypeOf(message).Elem(), value.Elem()); err != nil {
 		return nil
 	}
-	b, err := json.Marshal(request)
+	b, err := json.Marshal(message)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
 		return nil
 	}
-	fmt.Fprintf(os.Stderr, "REQUEST: %s\n", string(b))
+	fmt.Fprintf(os.Stderr, logType+": %s\n", string(b))
 	return nil
+}
+
+//LogResponse log a response
+func LogResponse(request interface{}) (err error) {
+	return Log(request, "RESPONSE")
 }
 
 func stripValues(t reflect.Type, v reflect.Value) (err error) {
