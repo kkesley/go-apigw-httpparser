@@ -2,7 +2,6 @@ package httpparser
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"reflect"
@@ -33,16 +32,16 @@ func Log(request interface{}, logType string) (err error) {
 		}
 	}()
 	value := reflect.ValueOf(request)
-	if value.Kind() != reflect.Ptr || value.IsNil() {
-		return errors.New("value must be pointer")
+	if value.Kind() == reflect.Ptr && !value.IsNil() {
+		if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
+			return err
+		}
 	}
-	if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
-		return nil
-	}
+
 	b, err := json.Marshal(request)
 	if err != nil {
 		fmt.Printf("Error: %s", err)
-		return nil
+		return err
 	}
 	fmt.Fprintf(os.Stderr, logType+": %s\n", string(b))
 	return nil
