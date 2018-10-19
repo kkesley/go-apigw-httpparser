@@ -29,12 +29,12 @@ func Log(request interface{}, logType string) (err error) {
 				panic(s)
 			}
 			err = r.(error)
+			fmt.Println(err)
 		}
 	}()
 	value := reflect.ValueOf(request)
 	if value.Kind() == reflect.Ptr && !value.IsNil() {
 		if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
-			fmt.Println(err)
 			return err
 		}
 	}
@@ -72,7 +72,7 @@ func stripValues(t reflect.Type, v reflect.Value) (err error) {
 			stripValues(value.Type(), value)
 		} else if value.Kind() == reflect.Slice {
 			for i := 0; i < value.Len(); i++ {
-				if value.Index(i).Kind() == reflect.Struct {
+				if value.Index(i).Kind() != reflect.Ptr {
 					stripValues(value.Index(i).Type(), value.Index(i))
 				} else {
 					stripValues(value.Index(i).Type(), value.Index(i).Elem())
