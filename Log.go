@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"runtime"
 )
 
 //LogRequest logs request to stderr
@@ -20,20 +19,22 @@ func LogResponse(code int, request interface{}) (err error) {
 
 //Log the request
 func Log(request interface{}, logType string) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if _, ok := r.(runtime.Error); ok {
-				panic(r)
-			}
-			if s, ok := r.(string); ok {
-				panic(s)
-			}
-			err = r.(error)
-		}
-	}()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		if _, ok := r.(runtime.Error); ok {
+	// 			panic(r)
+	// 		}
+	// 		if s, ok := r.(string); ok {
+	// 			panic(s)
+	// 		}
+	// 		err = r.(error)
+	// 		fmt.Println(err)
+	// 	}
+	// }()
 	value := reflect.ValueOf(request)
 	if value.Kind() == reflect.Ptr && !value.IsNil() {
 		if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
+			fmt.Println(err)
 			return err
 		}
 	}
@@ -48,9 +49,14 @@ func Log(request interface{}, logType string) (err error) {
 }
 
 func stripValues(t reflect.Type, v reflect.Value) (err error) {
-	if v.Kind() != reflect.Struct {
+	if v.Kind() == reflect.Slice {
+		for i := 0; i < v.Len(); i++ {
+			stripValues(v.Index(i).Type(), v.Index(i).Elem())
+		}
+	} else if v.Kind() != reflect.Struct {
 		return nil
 	}
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value := v.Field(i)
@@ -66,7 +72,11 @@ func stripValues(t reflect.Type, v reflect.Value) (err error) {
 			stripValues(value.Type(), value)
 		} else if value.Kind() == reflect.Slice {
 			for i := 0; i < value.Len(); i++ {
-				stripValues(value.Index(i).Type(), value.Index(i).Elem())
+				if value.Index(i).Kind() == reflect.Struct {
+					stripValues(value.Index(i).Type(), value.Index(i))
+				} else {
+					stripValues(value.Index(i).Type(), value.Index(i).Elem())
+				}
 			}
 		} else if value.Kind() == reflect.Ptr && !value.IsNil() {
 			stripValues(value.Elem().Type(), value.Elem())
