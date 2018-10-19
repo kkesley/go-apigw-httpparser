@@ -75,7 +75,7 @@ func stripValues(t reflect.Type, v reflect.Value) (err error) {
 				if value.Index(i).Kind() != reflect.Ptr {
 					stripValues(value.Index(i).Type(), value.Index(i))
 				} else {
-					stripValues(value.Index(i).Type(), value.Index(i).Elem())
+					stripValues(value.Index(i).Elem().Type(), value.Index(i).Elem())
 				}
 			}
 		} else if value.Kind() == reflect.Ptr && !value.IsNil() {
