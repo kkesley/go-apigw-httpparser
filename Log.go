@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"runtime"
 )
 
 //LogRequest logs request to stderr
@@ -19,18 +20,17 @@ func LogResponse(code int, request interface{}) (err error) {
 
 //Log the request
 func Log(request interface{}, logType string) (err error) {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		if _, ok := r.(runtime.Error); ok {
-	// 			panic(r)
-	// 		}
-	// 		if s, ok := r.(string); ok {
-	// 			panic(s)
-	// 		}
-	// 		err = r.(error)
-	// 		fmt.Println(err)
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
+				panic(r)
+			}
+			if s, ok := r.(string); ok {
+				panic(s)
+			}
+			err = r.(error)
+		}
+	}()
 	value := reflect.ValueOf(request)
 	if value.Kind() == reflect.Ptr && !value.IsNil() {
 		if err := stripValues(reflect.TypeOf(request).Elem(), value.Elem()); err != nil {
